@@ -2,7 +2,7 @@
 Shared sidebar navigation component.
 
 Renders the KNOWAI brand block, the primary nav group (Home / Admin Panel /
-Chatbot), the secondary nav group (Evaluation / Retrieval / Knowledge Base),
+Chatbot), the secondary nav group (Retrieval options / Guardrails / Evaluation),
 and the settings + version footer — identically across every page.
 
 Usage::
@@ -37,9 +37,9 @@ def render_sidebar() -> None:
         st.divider()
 
         # ── Secondary navigation ─────────────────────────────────────────────
-        st.page_link("pages/04_evaluation.py",     label="Evaluation",     icon=":material/analytics:")
         st.page_link("pages/05_retrieval.py",      label="Retrieval options", icon=":material/manage_search:")
-        st.page_link("pages/06_knowledge_base.py", label="Knowledge Base", icon=":material/menu_book:")
+        st.page_link("pages/06_guardrails.py",     label="Guardrails", icon=":material/shield:")
+        st.page_link("pages/04_evaluation.py",     label="Evaluation",     icon=":material/analytics:")
         st.divider()
 
         # ── Settings ──────────────────────────────────────────────────────────

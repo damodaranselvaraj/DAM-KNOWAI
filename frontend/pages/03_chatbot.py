@@ -259,6 +259,33 @@ with main_col:
         hero_slot.empty()
 
         # Build payload
+        # NOTE: the backend validates `filters` against a strict allow-list
+        # of indexed Pinecone metadata fields (see
+        # backend/retrieval/query_validator.py::ALLOWED_FILTER_FIELDS) and
+        # rejects any unknown key outright — even if its value is None/empty.
+        # So we must (a) only send filters the user actually set, and
+        # (b) map UI field names to the real indexed field names
+        # (date_from/date_to -> published_at range, doc_types -> mime).
+        filters: dict = {}
+
+        corpus = st.session_state.get("chat_filter_corpus")
+        if corpus and corpus != "All":
+            filters["corpus"] = corpus
+
+        date_from = st.session_state.get("chat_filter_date_from")
+        date_to   = st.session_state.get("chat_filter_date_to")
+        if date_from or date_to:
+            published_at: dict = {}
+            if date_from:
+                published_at["$gte"] = date_from
+            if date_to:
+                published_at["$lte"] = date_to
+            filters["published_at"] = published_at
+
+        doc_types = st.session_state.get("chat_filter_doc_types", [])
+        if doc_types:
+            filters["mime"] = {"$in": doc_types}
+
         payload = {
             "session_id":       get_session_id(),
             "query":            query,
@@ -268,12 +295,7 @@ with main_col:
             "hybrid_search":    bool(st.session_state.get("chat_hybrid_search", True)),
             "reranker_enabled": bool(st.session_state.get("chat_reranker", True)),
             "citation_mode":    st.session_state.get("chat_citation_mode", "paragraph"),
-            "filters": {
-                "corpus":    st.session_state.get("chat_filter_corpus"),
-                "date_from": st.session_state.get("chat_filter_date_from"),
-                "date_to":   st.session_state.get("chat_filter_date_to"),
-                "doc_types": st.session_state.get("chat_filter_doc_types", []),
-            },
+            "filters":          filters or None,
         }
 
         # ── Append the question and an answer bubble to the log, then stream

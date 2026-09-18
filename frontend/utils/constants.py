@@ -149,6 +149,131 @@ DEFAULT_PIPELINE_CONFIG: dict = {
     },
 }
 
+# ─── Default Guardrail Config ─────────────────────────────────────────────────
+# Mirrors backend.models.guardrail_config.GuardrailConfig defaults exactly —
+# every guardrail enabled by default.
+DEFAULT_GUARDRAIL_CONFIG: dict = {
+    "toggles": {
+        "enable_input_length_check":        True,
+        "enable_toxicity_check":             True,
+        "enable_prompt_injection_check":     True,
+        "enable_jailbreak_check":            True,
+        "enable_pii_masking_input":          True,
+        "enable_intent_classification":      True,
+        "enable_out_of_scope_check":         True,
+        "enable_metadata_filtering":         True,
+        "enable_hybrid_retrieval":           True,
+        "enable_relevance_threshold_gate":   True,
+        "enable_context_dedup":              True,
+        "enable_context_relevance_scoring":  True,
+        "enable_groundedness_check":         True,
+        "enable_hallucination_check":        True,
+        "enable_citation_validation":        True,
+        "enable_pii_masking_output":         True,
+        "enable_output_toxicity_check":      True,
+    },
+    "thresholds": {
+        "relevance_threshold":          0.70,
+        "max_characters":               2000,
+        "max_tokens":                   500,
+        "max_documents":                10,
+        "max_query_length":             300,
+        "top_n_retrieval":              20,
+        "dedup_similarity_threshold":   0.95,
+        "groundedness_threshold":       0.75,
+        "hallucination_threshold":      0.5,
+    },
+}
+
+# ─── Guardrail layer/checkbox metadata ─────────────────────────────────────────
+# Drives the checkbox sections on the Guardrails page. Each entry maps a
+# GuardrailToggles field name to its display label + help text, grouped by
+# pipeline layer.
+GUARDRAIL_LAYERS: list[dict] = [
+    {
+        "key": "layer1",
+        "title": "Layer 1 — Input Guardrails",
+        "description": "Checks applied to the raw user query before any processing begins.",
+        "icon": "shield",
+        "checks": [
+            ("enable_input_length_check", "Input Length / Token Validation",
+             "Rejects queries exceeding max characters, tokens, word count, or document count."),
+            ("enable_toxicity_check", "Toxicity / Abuse Detection",
+             "Blocks hateful, abusive, profane, or violent language in the query."),
+            ("enable_prompt_injection_check", "Prompt Injection Detection",
+             "Detects attempts to override system instructions or hijack the pipeline."),
+            ("enable_jailbreak_check", "Jailbreak Detection",
+             "Detects roleplay / fictional-framing / encoded jailbreak attempts."),
+            ("enable_pii_masking_input", "PII Detection + Masking (Input)",
+             "Masks PAN, Aadhaar, credit card, bank account, email, phone, address, employee/customer IDs."),
+        ],
+    },
+    {
+        "key": "layer2",
+        "title": "Layer 2 — Query Control",
+        "description": "Classifies and routes the query before embedding or retrieval.",
+        "icon": "git-branch",
+        "checks": [
+            ("enable_intent_classification", "Intent Classification / Query Router",
+             "Classifies the query as greeting, casual, knowledge, document, or out-of-scope."),
+            ("enable_out_of_scope_check", "Out-of-Scope Detection",
+             "Blocks queries unrelated to the enterprise knowledge domain with a fixed refusal."),
+        ],
+    },
+    {
+        "key": "layer3",
+        "title": "Layer 3 — Retrieval Safety",
+        "description": "Applied while retrieving candidate documents.",
+        "icon": "search",
+        "checks": [
+            ("enable_metadata_filtering", "Metadata Filtering",
+             "Restricts retrieval to documents within the caller's department / access level / date range."),
+            ("enable_hybrid_retrieval", "Hybrid Retrieval (Top-N)",
+             "Retrieves the configured Top-N documents (dense + sparse) before reranking."),
+        ],
+    },
+    {
+        "key": "layer4",
+        "title": "Layer 4 — Context Control",
+        "description": "Applied after reranking, before the context reaches the LLM.",
+        "icon": "filter",
+        "checks": [
+            ("enable_relevance_threshold_gate", "Relevance Threshold Gate",
+             "Drops reranked documents scoring below the relevance threshold."),
+            ("enable_context_dedup", "Context Deduplication",
+             "Removes exact and near-duplicate chunks from hybrid retrieval."),
+            ("enable_context_relevance_scoring", "Context Relevance Scoring",
+             "Final query-to-chunk relevance check; drops chunks that still fall short."),
+        ],
+    },
+    {
+        "key": "layer5",
+        "title": "Layer 5 — Generation Safety",
+        "description": "Applied to the LLM's answer before any output-level checks.",
+        "icon": "check-circle",
+        "checks": [
+            ("enable_groundedness_check", "Groundedness Check",
+             "Verifies the answer's claims are supported by the retrieved context."),
+            ("enable_hallucination_check", "Hallucination Detection",
+             "Cross-references entities/facts in the answer against the retrieved context."),
+            ("enable_citation_validation", "Citation Validation",
+             "Strips citations that don't correspond to an actual retrieved source."),
+        ],
+    },
+    {
+        "key": "layer6",
+        "title": "Layer 6 — Output Safety",
+        "description": "The final checks before the response is returned to the user.",
+        "icon": "shield-check",
+        "checks": [
+            ("enable_pii_masking_output", "PII Detection + Masking (Output)",
+             "Masks any PII the LLM may have reproduced from the retrieved context."),
+            ("enable_output_toxicity_check", "Output Toxicity / Abuse Detection",
+             "Blocks toxic, harmful, or inappropriate generated content."),
+        ],
+    },
+]
+
 # ─── Color Scheme ─────────────────────────────────────────────────────────────
 COLOR_SCHEME: dict = {
     "primary":          "#6C63FF",
