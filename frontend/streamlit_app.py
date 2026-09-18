@@ -14,14 +14,14 @@ from frontend.components.nav_sidebar import render_sidebar
 
 # ─── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="KNOWAI",
+    page_title="DAM KNOWAI",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
         "Get Help":     "https://github.com/your-repo",
         "Report a bug": "https://github.com/your-repo/issues",
-        "About":        "# KNOWAI\nIntelligent Knowledge Platform — Powered by Pinecone, Cohere & OpenAI",
+        "About":        "# DAM KNOWAI\nIntelligent Knowledge Platform — Powered by Pinecone, Cohere & OpenAI",
     },
 )
 

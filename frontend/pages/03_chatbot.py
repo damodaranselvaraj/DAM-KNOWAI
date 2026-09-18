@@ -24,7 +24,7 @@ from frontend.components.nav_sidebar import render_sidebar
 
 # ─── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Chatbot · KNOWAI", page_icon="🧠", layout="wide"
+    page_title="Chatbot · DAM KNOWAI", page_icon="🧠", layout="wide"
 )
 
 _CSS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "styles", "custom.css")

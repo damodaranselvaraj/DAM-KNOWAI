@@ -14,7 +14,7 @@ from frontend.utils.icons import icon, icon_text
 from frontend.components.nav_sidebar import render_sidebar
 
 # ─── Page config ──────────────────────────────────────────────────────────────
-st.set_page_config(page_title="Evaluation · KNOWAI", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="Evaluation · DAM KNOWAI", page_icon="🧠", layout="wide")
 
 _CSS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "styles", "custom.css")
 if os.path.exists(_CSS):

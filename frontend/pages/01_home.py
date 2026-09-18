@@ -16,7 +16,7 @@ from frontend.components.nav_sidebar import render_sidebar
 
 # ─── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="KNOWAI",
+    page_title="DAM KNOWAI",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -53,7 +53,7 @@ st.markdown(
     f"<div class='hero-title'>"
     f"<div style='display:flex;align-items:center;justify-content:center;gap:0.75rem;margin-top:-1.5rem;margin-bottom:0.1rem'>"
     f"{icon('brain', size=44, color='#069494')}"
-    f"<h1 style='margin:0!important'>KNOWAI</h1>"
+    f"<h1 style='margin:0!important'>DAM KNOWAI</h1>"
     f"</div>"
     f"<p class='hero-category'>Intelligent Knowledge Platform</p>"
     f"<p class='hero-tagline'>AI-Powered Document Intelligence</p>"
@@ -90,7 +90,7 @@ with right_col:
         f"<div class='card-icon'>"
         f"{icon('message-circle', size=34, color='#007080')}"
         f"</div>"
-        f"<h2>KNOWAI Chatbot</h2>"
+        f"<h2>DAM KNOWAI Chatbot</h2>"
         f"<ul>"
         f"<li>{icon_text('send', 'Start Conversation', size=14, color='#007080')}</li>"
         f"<li>{icon_text('search', 'Ask Questions', size=14, color='#007080')}</li>"
