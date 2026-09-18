@@ -1,0 +1,29 @@
+# ─── RAG Pipeline API — backend image ─────────────────────────────────────────
+# Build from the repository root:
+#   docker build -f docker/Dockerfile.backend -t rag-backend .
+FROM python:3.11-slim AS base
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+# System deps needed by pymupdf / docling / sentence-transformers wheels
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY backend/ ./backend/
+
+# Pre-download NLTK corpora used by SparseRetriever so the container doesn't
+# hit the network on every restart.
+RUN python -m nltk.downloader -d /usr/share/nltk_data stopwords punkt punkt_tab || true
+ENV NLTK_DATA=/usr/share/nltk_data
+
+EXPOSE 8000
+
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

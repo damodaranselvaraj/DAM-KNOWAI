@@ -1,0 +1,32 @@
+[project]
+name = "rag-intelligence-platform"
+version = "1.0.0"
+description = "Production-ready Retrieval-Augmented Generation (RAG) platform with FastAPI backend and Streamlit frontend."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary" }
+
+# Runtime dependencies are pinned in requirements.txt (single source of
+# truth for `pip install -r requirements.txt`). This table is intentionally
+# left empty to avoid a second, potentially divergent, dependency list.
+dependencies = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = [".venv", ".data", ".cache", "frontend/__pycache__"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"

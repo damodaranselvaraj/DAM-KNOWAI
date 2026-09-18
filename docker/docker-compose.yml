@@ -1,0 +1,45 @@
+# ─── RAG Intelligence Platform — local multi-container stack ─────────────────
+# Run from the repository root:
+#   docker compose -f docker/docker-compose.yml up --build
+#
+# Secrets (OPENAI_API_KEY, PINECONE_API_KEY, COHERE_API_KEY, etc.) are read
+# from the repo-root .env file — copy .env.example to .env and fill it in
+# before starting this stack. Do not commit a populated .env file.
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    image: rag-intelligence-backend:local
+    env_file:
+      - ../.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../.data:/app/.data
+      - ../.cache:/app/.cache
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health/ping')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    image: rag-intelligence-frontend:local
+    env_file:
+      - ../.env
+    environment:
+      # Frontend calls the backend by its service name inside the compose
+      # network rather than localhost. Matches frontend/config.py's
+      # FrontendSettings.API_BASE_URL.
+      API_BASE_URL: "http://backend:8000/api/v1"
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
+    restart: unless-stopped

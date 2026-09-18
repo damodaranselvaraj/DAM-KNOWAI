@@ -1,0 +1,1286 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   RAG Pipeline Hub — Global Custom CSS
+   Design: Light theme  |  Brand palette: #069494 · #FFFFFF · #00F0FF
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Google Fonts ──────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ─── CSS Custom Properties ─────────────────────────────────────────────── */
+:root {
+  /* Brand */
+  --primary:        #069494;
+  --primary-light:  #0ab8b8;
+  --primary-dark:   #047070;
+  --accent:         #00F0FF;
+  --accent-soft:    rgba(0, 240, 255, 0.18);
+
+  /* Neutrals */
+  --white:          #FFFFFF;
+  --bg-page:        #F5F7FA;
+  --bg-card:        #FFFFFF;
+  --bg-surface:     #F0F4F8;
+  --bg-hover:       #E8F5F5;
+
+  /* Text */
+  --text-primary:   #1A2B3C;
+  --text-secondary: #4A6070;
+  --text-muted:     #8A9BAC;
+  --text-on-primary:#FFFFFF;
+
+  /* Borders */
+  --border:         #D8E4EC;
+  --border-focus:   #069494;
+
+  /* Semantic */
+  --success:        #0D9E6E;
+  --success-bg:     #E8F9F4;
+  --warning:        #D97706;
+  --warning-bg:     #FEF3C7;
+  --danger:         #DC2626;
+  --danger-bg:      #FEE2E2;
+  --info:           #069494;
+  --info-bg:        #E0F7F7;
+
+  /* Sidebar */
+  --sidebar-bg:     #069494;
+  --sidebar-text:   #FFFFFF;
+  --sidebar-hover:  rgba(255,255,255,0.15);
+  --sidebar-active: rgba(255,255,255,0.25);
+
+  /* Radii */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+  --radius-xl:  22px;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 4px rgba(6,148,148,0.08);
+  --shadow-md:  0 4px 16px rgba(6,148,148,0.12);
+  --shadow-lg:  0 8px 32px rgba(6,148,148,0.18);
+  --shadow-card:0 2px 8px rgba(0,0,0,0.06);
+
+  /* Standard cyan "box" border + glow used across Home page cards/boxes */
+  --box-border:      1.6px solid rgb(0, 240, 255);
+  --box-glow:        0 0 14px rgba(0, 240, 255, 0.18);
+
+  --transition: 0.18s ease;
+}
+
+/* ─── Keyframes ─────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0);   }
+}
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0);    }
+}
+@keyframes pulse {
+  0%,100% { opacity:1; }
+  50%      { opacity:0.45; }
+}
+@keyframes shimmer {
+  0%   { background-position:-200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes typingCursor {
+  0%,100% { opacity:1; }
+  50%      { opacity:0; }
+}
+@keyframes spin {
+  from { transform:rotate(0deg);   }
+  to   { transform:rotate(360deg); }
+}
+@keyframes dotPulse {
+  0%,80%,100% { transform:scale(0); opacity:0.4; }
+  40%          { transform:scale(1); opacity:1;   }
+}
+@keyframes dotBounce {
+  0%,80%,100% { transform: translateY(0);    opacity:0.5; }
+  40%          { transform: translateY(-6px); opacity:1;   }
+}
+
+/* ─── Global Reset ──────────────────────────────────────────────────────── */
+html, body,
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"] {
+  background-color: var(--bg-page) !important;
+  color: var(--text-primary) !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* Force Streamlit's main content area to white */
+[data-testid="stMainBlockContainer"] {
+  background-color: var(--white) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 0.25rem 2rem 1rem !important;
+}
+
+/* Pull the whole main content block upward, closer to the top of the
+   viewport, so more content is visible without scrolling. */
+[data-testid="stMain"] > div {
+  padding-top: 0 !important;
+}
+
+/* Tighten default vertical gaps Streamlit inserts between stacked elements,
+   so pages need less scrolling to reach content below the fold. */
+[data-testid="stVerticalBlock"] {
+  gap: 0.5rem !important;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:var(--bg-surface); }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:var(--primary); }
+
+/* ─── Sidebar ───────────────────────────────────────────────────────────── */
+[data-testid="stSidebar"] {
+  background-color: var(--sidebar-bg) !important;
+  border-right: none !important;
+}
+
+[data-testid="stSidebar"] * {
+  color: var(--sidebar-text) !important;
+}
+
+/* Nav link items */
+[data-testid="stSidebar"] [data-testid="stPageLink"] a,
+[data-testid="stSidebar"] a {
+  border-radius: var(--radius-sm) !important;
+  padding: 0.45rem 0.75rem !important;
+  transition: background var(--transition) !important;
+  color: var(--sidebar-text) !important;
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.6rem !important;
+  font-size: 1.02rem !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stPageLink"] a p {
+  font-size: 1.02rem !important;
+  font-weight: 500 !important;
+}
+
+/* Sidebar section captions (e.g. "PAGES") */
+[data-testid="stSidebar"] .sidebar-section-label {
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: rgba(255,255,255,0.55) !important;
+  padding: 0.2rem 0.75rem 0.1rem !important;
+  margin: 0 !important;
+}
+
+/* Sidebar footer (version tag) pinned toward the bottom */
+[data-testid="stSidebar"] .sidebar-footer {
+  margin-top: 0.25rem;
+}
+
+[data-testid="stSidebar"] [data-testid="stPageLink"] a > div,
+[data-testid="stSidebar"] [data-testid="stPageLink"] a span,
+[data-testid="stSidebar"] [data-testid="stPageLink"] a p {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.6rem !important;
+  margin: 0 !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stPageLink"] a:hover,
+[data-testid="stSidebar"] a:hover {
+  background: var(--sidebar-hover) !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stPageLink"] a[aria-current],
+[data-testid="stSidebar"] a[aria-current] {
+  background: var(--sidebar-active) !important;
+  font-weight: 600 !important;
+}
+
+[data-testid="stSidebar"] hr {
+  border-color: rgba(255,255,255,0.25) !important;
+}
+
+[data-testid="stSidebar"] .stCaption,
+[data-testid="stSidebar"] small {
+  color: rgba(255,255,255,0.65) !important;
+}
+
+/* ─── Typography ────────────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+}
+
+p, li {
+  color: var(--text-secondary) !important;
+}
+
+label, .stCaption {
+  color: var(--text-secondary) !important;
+}
+
+/* ─── Buttons ───────────────────────────────────────────────────────────── */
+[data-testid="stButton"] button[kind="primary"],
+[data-testid="stButton"] button {
+  background: var(--primary) !important;
+  color: var(--white) !important;
+  border: none !important;
+  border-radius: var(--radius-md) !important;
+  font-weight: 600 !important;
+  font-family: 'Inter', sans-serif !important;
+  transition: all var(--transition) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+[data-testid="stButton"] button:hover {
+  background: var(--primary-dark) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+[data-testid="stButton"] button:active {
+  transform: translateY(0) !important;
+}
+
+[data-testid="stButton"] button[kind="secondary"] {
+  background: var(--white) !important;
+  color: var(--primary) !important;
+  border: 1.5px solid var(--primary) !important;
+}
+
+[data-testid="stButton"] button[kind="secondary"]:hover {
+  background: var(--bg-hover) !important;
+}
+
+/* ─── Form Inputs ───────────────────────────────────────────────────────── */
+[data-testid="stTextInput"] input,
+[data-testid="stTextArea"] textarea,
+[data-testid="stNumberInput"] input {
+  background: var(--white) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--text-primary) !important;
+  font-family: 'Inter', sans-serif !important;
+  transition: border-color var(--transition) !important;
+}
+
+[data-testid="stTextInput"] input:focus,
+[data-testid="stTextArea"] textarea:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(6,148,148,0.12) !important;
+  outline: none !important;
+}
+
+/* ─── Selectbox ─────────────────────────────────────────────────────────── */
+[data-testid="stSelectbox"] > div > div {
+  background: var(--white) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ─── Multiselect ────────────────────────────────────────────────────────── */
+/* BaseWeb defaults each selected "tag" to Streamlit's primary theme color
+   (a red/pink by default), independent of our light-teal palette above.
+   Re-skin the tags so they match the app's brand colors instead. */
+[data-testid="stMultiSelect"] > div > div {
+  background: var(--white) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+[data-testid="stMultiSelect"] span[data-baseweb="tag"] {
+  background: var(--primary) !important;
+  border-radius: 6px !important;
+}
+
+[data-testid="stMultiSelect"] span[data-baseweb="tag"] span {
+  color: var(--white) !important;
+}
+
+[data-testid="stMultiSelect"] span[data-baseweb="tag"] svg {
+  fill: var(--white) !important;
+}
+
+/* ─── Sliders ───────────────────────────────────────────────────────────── */
+[data-testid="stSlider"] [role="slider"] {
+  background: var(--primary) !important;
+  border: 2px solid var(--primary-light) !important;
+}
+
+[data-testid="stSlider"] [data-testid="stSliderTrack"] > div:first-child {
+  background: var(--primary) !important;
+}
+
+/* ─── Toggle ────────────────────────────────────────────────────────────── */
+[data-testid="stToggle"] > label > div[data-checked="true"] {
+  background: var(--primary) !important;
+}
+
+/* ─── Radio ─────────────────────────────────────────────────────────────── */
+[data-testid="stRadio"] label {
+  color: var(--text-primary) !important;
+}
+
+/* ─── Tabs ───────────────────────────────────────────────────────────────── */
+[data-testid="stTabs"] [role="tab"] {
+  color: var(--text-secondary) !important;
+  font-weight: 500 !important;
+  border-bottom: 2px solid transparent !important;
+  transition: all var(--transition) !important;
+}
+
+[data-testid="stTabs"] [role="tab"][aria-selected="true"] {
+  color: var(--primary) !important;
+  border-bottom-color: var(--primary) !important;
+  font-weight: 600 !important;
+}
+
+/* ─── Expander ──────────────────────────────────────────────────────────── */
+[data-testid="stExpander"] {
+  background: var(--white) !important;
+  border: var(--box-border) !important;
+  border-radius: var(--radius-md) !important;
+  margin-bottom: 0.75rem !important;
+  box-shadow: var(--box-glow) !important;
+}
+
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] [data-testid="stExpanderToggleIcon"] {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+}
+
+/* ─── DataFrames ────────────────────────────────────────────────────────── */
+[data-testid="stDataFrame"] {
+  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  overflow: hidden !important;
+}
+
+/* ─── Progress Bars ─────────────────────────────────────────────────────── */
+[data-testid="stProgress"] > div > div {
+  background: var(--primary) !important;
+  border-radius: 999px !important;
+  transition: width 0.4s ease !important;
+}
+
+[data-testid="stProgress"] > div {
+  background: var(--bg-surface) !important;
+  border-radius: 999px !important;
+}
+
+/* ─── Alerts ─────────────────────────────────────────────────────────────── */
+[data-testid="stAlert"] {
+  border-radius: var(--radius-md) !important;
+  border-left-width: 4px !important;
+}
+
+/* ─── Divider ────────────────────────────────────────────────────────────── */
+hr {
+  border-color: var(--border) !important;
+  margin: 1rem 0 !important;
+}
+
+/* ─── Metric ─────────────────────────────────────────────────────────────── */
+[data-testid="stMetric"] {
+  background: var(--white) !important;
+  border: var(--box-border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0.75rem 1.25rem !important;
+  transition: all var(--transition) !important;
+  box-shadow: var(--box-glow) !important;
+}
+
+[data-testid="stMetric"]:hover {
+  border-color: var(--accent) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+[data-testid="stMetricValue"] {
+  color: var(--primary) !important;
+  font-weight: 800 !important;
+}
+
+[data-testid="stMetricLabel"] {
+  color: var(--text-secondary) !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* ─── Spinner ────────────────────────────────────────────────────────────── */
+[data-testid="stSpinner"] { color: var(--primary) !important; }
+
+/* ─── Code ───────────────────────────────────────────────────────────────── */
+code, pre {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--primary-dark) !important;
+  font-size: 0.85em !important;
+}
+
+/* ─── File Uploader ──────────────────────────────────────────────────────── */
+[data-testid="stFileUploader"] {
+  border: 2px dashed var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-surface) !important;
+  transition: all var(--transition) !important;
+}
+
+[data-testid="stFileUploader"]:hover {
+  border-color: var(--primary) !important;
+  background: var(--bg-hover) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CUSTOM COMPONENT CLASSES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Page Title block ───────────────────────────────────────────────────── */
+.page-header {
+  padding: 0 0 0.4rem;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 0.4rem;
+  animation: fadeIn 0.4s ease;
+}
+
+.page-header h1 {
+  font-size: 1.9rem !important;
+  font-weight: 800 !important;
+  color: var(--primary) !important;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.page-header p {
+  color: var(--text-muted) !important;
+  font-size: 0.85rem !important;
+  margin: 0.2rem 0 0 !important;
+}
+
+/* ─── Hero Title ─────────────────────────────────────────────────────────── */
+.hero-title {
+  text-align: center;
+  padding: 0.25rem 0 0.5rem;
+  animation: fadeIn 0.5s ease;
+}
+
+.hero-title h1 {
+  font-size: 2.4rem !important;
+  font-weight: 800 !important;
+  color: var(--primary) !important;
+  margin: 0 !important;
+  line-height: 1.1 !important;
+}
+
+.hero-title p {
+  color: var(--text-secondary) !important;
+  font-size: 1rem !important;
+  margin: 0 !important;
+}
+
+.hero-title p.hero-category {
+  color: var(--primary) !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  margin: 0.1rem 0 0.1rem !important;
+}
+
+.hero-title p.hero-tagline {
+  color: var(--text-muted) !important;
+  font-size: 0.92rem !important;
+  font-weight: 500 !important;
+  margin: 0 0 0.6rem !important;
+  letter-spacing: 0.02em;
+}
+
+.hero-title p.hero-description {
+  margin-bottom: 1.2rem !important;
+}
+
+/* ─── Nav Cards (Home page) ──────────────────────────────────────────────── */
+.nav-card {
+  border-radius: var(--radius-xl) !important;
+  padding: 0.68rem 1.75rem !important;
+  text-align: center !important;
+  transition: all 0.25s ease !important;
+  animation: slideUp 0.45s ease !important;
+  cursor: pointer !important;
+  background: var(--white) !important;
+}
+
+.nav-card-admin,
+.nav-card-chat {
+  border: var(--box-border) !important;
+  box-shadow: var(--box-glow) !important;
+}
+
+.nav-card-admin:hover,
+.nav-card-chat:hover {
+  background: rgba(0,240,255,0.05) !important;
+  box-shadow: 0 8px 32px rgba(0,240,255,0.28) !important;
+  transform: translateY(-4px) !important;
+}
+
+/* One-line breathing room between the nav card and its "Open …" button */
+.nav-card-spacer { height: 1.5rem; }
+
+/* "Open Admin Panel" / "Open Chatbot" buttons — filled with the standard
+   cyan glow tint to visually pair them with the card above. Scoped via a
+   marker element (`.nav-card-spacer`) inserted right before each button,
+   since Streamlit buttons don't expose their `key` as a DOM attribute. */
+div:has(> .nav-card-spacer) + div [data-testid="stButton"] button {
+  background: var(--accent-soft) !important;
+  color: var(--primary-dark) !important;
+  border: var(--box-border) !important;
+  box-shadow: var(--box-glow) !important;
+  font-weight: 600 !important;
+}
+
+div:has(> .nav-card-spacer) + div [data-testid="stButton"] button:hover {
+  background: rgba(0,240,255,0.28) !important;
+  color: var(--primary-dark) !important;
+}
+
+.nav-card .card-icon {
+  width: 44px; height: 44px;
+  margin: 0 auto 0.4rem;
+  background: var(--bg-surface);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.nav-card-admin .card-icon { background: var(--info-bg); }
+.nav-card-chat  .card-icon { background: rgba(0,240,255,0.1); }
+
+.nav-card h2 {
+  color: var(--text-primary) !important;
+  font-size: 1.55rem !important;
+  margin: 0 0 0.25rem !important;
+}
+
+.nav-card ul {
+  list-style: none !important;
+  padding: 0 !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  color: var(--text-secondary) !important;
+}
+
+.nav-card li { color: var(--text-secondary) !important; }
+
+/* ─── Status Bar ─────────────────────────────────────────────────────────── */
+.status-bar {
+  background: var(--white);
+  border: var(--box-border);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 1.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  box-shadow: var(--box-glow);
+}
+
+.status-bar strong { color: var(--text-primary); }
+
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+  flex-shrink: 0;
+}
+
+.status-dot-green  { background: var(--success); box-shadow: 0 0 5px var(--success); }
+.status-dot-yellow { background: var(--warning); box-shadow: 0 0 5px var(--warning); }
+.status-dot-red    { background: var(--danger);  box-shadow: 0 0 5px var(--danger);  }
+
+/* ─── Stat / Metric Cards ────────────────────────────────────────────────── */
+.metric-card {
+  background: var(--white);
+  border: var(--box-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  text-align: center;
+  transition: all var(--transition);
+  box-shadow: var(--box-glow);
+}
+
+.metric-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.metric-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Live Service Status Boxes (Home page) ─────────────────────────────── */
+.service-box {
+  background: var(--white);
+  border: var(--box-border);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.1rem;
+  transition: all var(--transition);
+  box-shadow: var(--box-glow);
+  height: 100%;
+}
+
+.service-box:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+}
+
+.service-box-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+}
+
+.service-box-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.25;
+  margin-bottom: 0.4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.service-box-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.service-box-status.is-ok    { color: var(--success); }
+.service-box-status.is-error { color: var(--danger);  }
+
+/* ─── Step / Guide Cards ─────────────────────────────────────────────────── */
+.step-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  border: var(--box-border);
+  margin-bottom: 0.65rem;
+  transition: all var(--transition);
+  box-shadow: var(--box-glow);
+  animation: fadeIn 0.3s ease;
+}
+
+.step-card:hover {
+  border-color: var(--accent);
+  transform: translateX(3px);
+  box-shadow: var(--shadow-md);
+}
+
+.step-number {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.step-card .step-title { font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+.step-card .step-desc  { color: var(--text-muted); font-size: 0.84rem; }
+
+/* ─── Badges / Pills ─────────────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.badge-success { background: var(--success-bg); color: var(--success); border: 1px solid rgba(13,158,110,0.25); }
+.badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(217,119,6,0.25);  }
+.badge-danger  { background: var(--danger-bg);  color: var(--danger);  border: 1px solid rgba(220,38,38,0.25);  }
+.badge-info    { background: var(--info-bg);    color: var(--primary); border: 1px solid rgba(6,148,148,0.25);  }
+.badge-accent  { background: var(--accent-soft); color: #007080; border: 1px solid rgba(0,240,255,0.35); }
+
+/* ─── Pipeline Stepper ───────────────────────────────────────────────────── */
+.pipeline-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 0;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.phase-box {
+  background: var(--white);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.1rem;
+  text-align: center;
+  min-width: 120px;
+  transition: all var(--transition);
+  box-shadow: var(--shadow-card);
+}
+
+.phase-box.complete    { border-color: var(--success); background: var(--success-bg); }
+.phase-box.in_progress { border-color: var(--primary); background: var(--info-bg); }
+.phase-box.failed      { border-color: var(--danger);  background: var(--danger-bg); }
+.phase-box.pending     { opacity: 0.5; }
+
+.phase-icon { font-size: 1.35rem; display: block; margin-bottom: 4px; }
+.phase-name { font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+.phase-pct  { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+
+.phase-arrow {
+  font-size: 1rem;
+  color: var(--text-muted);
+  padding: 0 0.35rem;
+  flex-shrink: 0;
+}
+
+.spin { animation: spin 1.2s linear infinite; display: inline-block; }
+
+/* ─── Legacy chat bubbles (frontend/components/chat_message.py) ──────────── */
+/* The Chatbot page uses native st.chat_message rows — see the CHATBOT SHELL
+   section at the bottom of this file. These classes remain for the standalone
+   bubble helpers in frontend/components/chat_message.py. */
+.chat-bubble-user {
+  display: flex;
+  justify-content: flex-end;
+  animation: fadeIn 0.25s ease;
+}
+
+.chat-bubble-user .bubble-inner {
+  background: var(--primary);
+  color: var(--white) !important;
+  border-radius: 16px 16px 4px 16px;
+  padding: 0.7rem 1rem;
+  max-width: 75%;
+  box-shadow: var(--shadow-sm);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.chat-bubble-assistant {
+  display: flex;
+  justify-content: flex-start;
+  animation: fadeIn 0.3s ease;
+}
+
+.chat-bubble-assistant .bubble-inner {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  color: var(--text-primary) !important;
+  border-radius: 16px 16px 16px 4px;
+  padding: 0.8rem 1rem;
+  max-width: 80%;
+  box-shadow: var(--shadow-card);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.bubble-meta {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+  padding: 0 4px;
+}
+
+.bubble-meta.right { text-align: right; }
+
+/* ─── Typing / Streaming ─────────────────────────────────────────────────── */
+.typing-cursor {
+  display: inline-block;
+  color: var(--primary);
+  font-weight: 600;
+  margin-left: 1px;
+  animation: typingCursor 0.8s step-end infinite;
+}
+
+.thinking-dots {
+  display: inline-flex;
+  align-items: center;
+}
+
+.thinking-dots span {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin: 0 3px;
+  animation: dotBounce 1.2s ease-in-out infinite;
+}
+
+.thinking-dots span:nth-child(2) { animation-delay: 0.15s; }
+.thinking-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+/* ─── Citation Card ──────────────────────────────────────────────────────── */
+.citation-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.85rem;
+  margin: 0.3rem 0;
+  font-size: 0.82rem;
+  transition: all var(--transition);
+  animation: fadeIn 0.3s ease;
+  box-shadow: var(--shadow-card);
+}
+
+.citation-card:hover {
+  border-left-color: var(--accent);
+  background: var(--bg-hover);
+  transform: translateX(2px);
+}
+
+.citation-header {
+  font-weight: 600;
+  color: var(--text-primary) !important;
+  font-size: 0.84rem;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.citation-meta {
+  color: var(--text-muted) !important;
+  font-size: 0.74rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 4px;
+}
+
+.citation-snippet {
+  color: var(--text-secondary) !important;
+  font-style: italic;
+  font-size: 0.77rem;
+  line-height: 1.4;
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
+  margin-top: 4px;
+}
+
+.score-badge {
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* ─── Shimmer Skeleton ───────────────────────────────────────────────────── */
+.shimmer {
+  background: linear-gradient(90deg, var(--bg-surface) 25%, var(--bg-hover) 50%, var(--bg-surface) 75%);
+  background-size: 200% auto;
+  border-radius: var(--radius-sm);
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* ─── Streaming text cursor ──────────────────────────────────────────────── */
+.streaming-text::after {
+  content: '|';
+  color: var(--primary);
+  animation: typingCursor 0.8s step-end infinite;
+  margin-left: 2px;
+}
+
+/* ─── Lucide icon sizing utilities ──────────────────────────────────────── */
+.icon-sm  svg { width:16px; height:16px; }
+.icon-md  svg { width:20px; height:20px; }
+.icon-lg  svg { width:28px; height:28px; }
+.icon-xl  svg { width:44px; height:44px; }
+
+.icon-primary svg { stroke: var(--primary) !important; }
+.icon-muted   svg { stroke: var(--text-muted) !important; }
+.icon-white   svg { stroke: var(--white) !important; }
+.icon-danger  svg { stroke: var(--danger) !important; }
+.icon-success svg { stroke: var(--success) !important; }
+
+/* ─── Sidebar brand block ────────────────────────────────────────────────── */
+.sidebar-brand {
+  text-align: center;
+  padding: 0.1rem 0 0.15rem;
+}
+
+.sidebar-brand .brand-name {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--white) !important;
+  letter-spacing: -0.01em;
+  margin: 0.3rem 0 0;
+}
+
+.sidebar-brand .brand-sub {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.65) !important;
+  margin: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Tighten the top of the sidebar so the brand block sits higher */
+[data-testid="stSidebarUserContent"] {
+  padding-top: 0.5rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHATBOT SHELL  —  frontend/pages/03_chatbot.py
+   ───────────────────────────────────────────────────────────────────────────
+   The chat UI is three native Streamlit pieces stacked in one st.container():
+
+     1. <span class="kb-chat-shell">        invisible CSS hook
+     2. st.container(height=450, border=False)   scrollable message log
+     3. st.chat_input()                          input row
+
+   Streamlit 1.35 containers carry no key or class of their own, so the marker
+   span above is matched with :has() to style this one vertical block.
+   DOM reference (1.35):
+     stVerticalBlockBorderWrapper > div > stVerticalBlock > element-container
+     stChatMessage > img[alt] + stChatMessageContent[aria-label]
+     stChatInput > div > [data-baseweb=textarea] + stChatInputSubmitButton
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.kb-chat-shell,
+.kb-chat-head,
+.kb-streaming { display: none; }
+
+/* Marker spans still sit in their own element container, which would reserve a
+   text line inside the box — collapse those containers entirely. */
+[data-testid="element-container"]:has(.kb-chat-shell),
+[data-testid="element-container"]:has(.kb-chat-head),
+[data-testid="element-container"]:has(.kb-streaming) {
+  display: none !important;
+}
+
+/* ─── Header block: heading + subtitle, left-aligned, no action buttons ─────
+   (New Chat / History now live in the right-hand controls column above the
+   Sessions section.) Font/color still come from the shared .page-header
+   h1/p rules. Pulled up toward the top of the column, with the subtitle
+   sitting tight under the heading and one blank line of space below it
+   before the chat box. */
+.kb-chat-title {
+  padding: 0 !important;
+  margin: -3.6rem 0 1.4rem !important;
+  border-bottom: none !important;
+  text-align: left !important;
+}
+
+.kb-chat-title h1 {
+  margin: 0 !important;
+  justify-content: flex-start !important;
+}
+
+.kb-chat-title p {
+  margin: 0.05rem 0 0 !important;
+}
+
+/* ─── The box: border, glow, width ───────────────────────────────────────── */
+[data-testid="stVerticalBlockBorderWrapper"]:has(
+  > div > [data-testid="stVerticalBlock"] > [data-testid="element-container"] .kb-chat-shell
+) {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: var(--white);
+  border: var(--box-border);                       /* 1.6px solid rgb(0,240,255) */
+  border-radius: var(--radius-lg);                 /* 16px                       */
+  box-shadow: 0 0 16px var(--accent-soft);         /* rgba(0,240,255,0.18)       */
+  overflow: hidden;                                /* clip children to the radius */
+}
+
+/* No gap between the log and the input row — they read as one surface. */
+[data-testid="stVerticalBlock"]:has(> [data-testid="element-container"] .kb-chat-shell) {
+  gap: 0 !important;
+}
+
+/* Keep the page header the same width as the box so they line up. The marker
+   must be matched through the exact child chain, otherwise the rule would also
+   catch the outer chat/controls columns and squeeze the whole page. */
+[data-testid="stVerticalBlockBorderWrapper"]:has(
+  > div > [data-testid="stVerticalBlock"] > [data-testid="element-container"] .kb-chat-head
+) {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* ─── Scrollable message log ─────────────────────────────────────────────── */
+[data-testid="stVerticalBlock"]:has(> [data-testid="element-container"] .kb-chat-shell)
+  > [data-testid="stVerticalBlockBorderWrapper"] {
+  padding: 16px;
+  background: var(--white);
+  border: none !important;
+  box-shadow: none !important;
+  scroll-behavior: smooth;
+}
+
+/* Row spacing inside the log */
+[data-testid="stVerticalBlock"]:has(> [data-testid="element-container"] .kb-chat-shell)
+  > [data-testid="stVerticalBlockBorderWrapper"] [data-testid="stVerticalBlock"] {
+  gap: 0.55rem !important;
+}
+
+/* ─── Message rows ───────────────────────────────────────────────────────── */
+.stChatMessage {
+  background: transparent !important;
+  padding: 0 !important;
+  gap: 10px !important;
+  align-items: flex-start !important;
+  animation: fadeIn 0.24s ease;
+}
+
+/* User rows mirror: bubble hugs the right edge, avatar sits after it. */
+.stChatMessage:has(> img[alt="user avatar"]) {
+  flex-direction: row-reverse !important;
+}
+
+/* ─── Avatars (inline Lucide SVG served as a data-URI <img>) ─────────────── */
+.stChatMessage > img {
+  width: 30px !important;
+  height: 30px !important;
+  padding: 5px;
+  margin-top: 1px;
+  box-sizing: border-box;
+  border-radius: 50% !important;
+  object-fit: contain !important;
+}
+
+.stChatMessage > img[alt="assistant avatar"] {
+  background: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+
+.stChatMessage > img[alt="user avatar"] {
+  background: #E0FFFE;
+  border: 1.5px solid rgb(0, 240, 255);
+}
+
+/* ─── Bubbles ────────────────────────────────────────────────────────────── */
+[data-testid="stChatMessageContent"] {
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  width: fit-content;
+  max-width: 75%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  padding: 0.68rem 0.9rem;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 14px 14px 14px 4px;
+  box-shadow: var(--shadow-card);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--text-primary) !important;
+}
+
+[data-testid="stChatMessageContent"][aria-label="Chat message from user"] {
+  background: #E0FFFE;
+  border-color: rgba(0, 240, 255, 0.55);
+  border-radius: 14px 14px 4px 14px;
+}
+
+/* Markdown inside a bubble: no stray top/bottom margins */
+[data-testid="stChatMessageContent"] [data-testid="stMarkdownContainer"] > p {
+  margin-bottom: 0.45rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+[data-testid="stChatMessageContent"] [data-testid="stMarkdownContainer"] > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+[data-testid="stChatMessageContent"] [data-testid="stMarkdownContainer"] ul,
+[data-testid="stChatMessageContent"] [data-testid="stMarkdownContainer"] ol {
+  margin-bottom: 0.45rem;
+  padding-left: 1.15rem;
+}
+
+/* Blinking caret while tokens stream in (marker element is inside the bubble) */
+[data-testid="stChatMessageContent"]:has(.kb-streaming)
+  [data-testid="stMarkdownContainer"] > p:last-of-type::after {
+  content: '▌';
+  color: var(--primary);
+  margin-left: 2px;
+  animation: typingCursor 0.8s step-end infinite;
+}
+
+.kb-thinking {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.kb-msg-meta {
+  font-size: 0.66rem;
+  color: var(--text-muted) !important;
+  letter-spacing: 0.02em;
+  margin-top: 4px;
+}
+
+/* ─── In-bubble references ───────────────────────────────────────────────── */
+.kb-refs {
+  margin-top: 0.55rem;
+  padding-top: 0.45rem;
+  border-top: 1px dashed var(--border);
+}
+
+.kb-refs-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+}
+
+.kb-refs-more > summary {
+  cursor: pointer;
+  font-size: 0.76rem;
+  color: var(--primary);
+  margin-top: 5px;
+}
+
+/* ─── Empty state ────────────────────────────────────────────────────────── */
+.kb-chat-empty {
+  text-align: center;
+  padding: 3.5rem 1rem 1rem;
+  color: var(--text-muted);
+  animation: fadeIn 0.4s ease;
+}
+
+.kb-chat-empty-icon { margin-bottom: 0.85rem; }
+
+.kb-chat-empty h3 {
+  color: var(--text-secondary) !important;
+  font-weight: 500 !important;
+  font-size: 1.05rem !important;
+  margin: 0 0 0.35rem !important;
+}
+
+.kb-chat-empty p {
+  font-size: 0.84rem !important;
+  color: var(--text-muted) !important;
+  margin: 0 !important;
+}
+
+/* ─── Input row ──────────────────────────────────────────────────────────── */
+[data-testid="stChatInput"] {
+  width: 100% !important;
+  background: #F0FEFF !important;
+  border: none !important;
+  border-top: 1px solid rgba(0, 240, 255, 0.25) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0.3rem 0.5rem 0.3rem 0.8rem;
+}
+
+/* Strip BaseWeb's input chrome — the row itself is the visible surface. */
+[data-testid="stChatInput"] [data-baseweb="textarea"],
+[data-testid="stChatInput"] [data-baseweb="base-input"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+[data-testid="stChatInputTextArea"] {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  font-family: 'Inter', -apple-system, sans-serif !important;
+  font-size: 0.92rem !important;
+  caret-color: var(--primary);
+  padding: 0.6rem 3.2rem 0.6rem 0.25rem !important;
+}
+
+[data-testid="stChatInputTextArea"]::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1;
+}
+
+/* ─── Send button ────────────────────────────────────────────────────────── */
+[data-testid="stChatInputSubmitButton"] {
+  align-self: center;              /* vertically centred in the input row */
+  width: 34px;
+  height: 34px;
+  margin-right: 2px;
+  padding: 0 !important;
+  border-radius: 10px !important;
+  background: rgb(0, 240, 255) !important;
+  color: #01474D !important;       /* 7.4:1 against the cyan fill */
+  box-shadow: 0 1px 5px rgba(0, 240, 255, 0.5) !important;
+  transition: all var(--transition);
+}
+
+[data-testid="stChatInputSubmitButton"] svg {
+  width: 18px;
+  height: 18px;
+}
+
+[data-testid="stChatInputSubmitButton"]:hover:not(:disabled) {
+  background: #00D4E6 !important;
+  color: #012B30 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 240, 255, 0.55) !important;
+}
+
+[data-testid="stChatInputSubmitButton"]:focus-visible {
+  outline: 2px solid var(--primary) !important;
+  outline-offset: 2px;
+}
+
+[data-testid="stChatInputSubmitButton"]:disabled,
+[data-testid="stChatInputSubmitButton"]:disabled:hover {
+  background: rgba(0, 240, 255, 0.3) !important;
+  color: rgba(1, 71, 77, 0.5) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  [data-testid="stChatMessageContent"] { max-width: 88%; }
+  .nav-card         { padding: 1.25rem 1rem !important; }
+  [data-testid="stMainBlockContainer"] { padding: 1rem !important; }
+}
