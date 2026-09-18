@@ -241,6 +241,37 @@ class RAGApiClient:
         except Exception:
             return []
 
+    # ── Guardrails ────────────────────────────────────────────────────────────
+
+    def get_guardrail_config(self) -> dict:
+        """Returns the active guardrail configuration (toggles + thresholds)."""
+        try:
+            return self._get("/guardrails/config")
+        except Exception:
+            from frontend.utils.constants import DEFAULT_GUARDRAIL_CONFIG
+            import copy
+            return copy.deepcopy(DEFAULT_GUARDRAIL_CONFIG)
+
+    def save_guardrail_config(self, config: dict) -> dict:
+        try:
+            return self._post("/guardrails/config", json=config)
+        except Exception:
+            return config
+
+    def reset_guardrail_config(self) -> dict:
+        try:
+            return self._post("/guardrails/config/reset")
+        except Exception:
+            from frontend.utils.constants import DEFAULT_GUARDRAIL_CONFIG
+            import copy
+            return copy.deepcopy(DEFAULT_GUARDRAIL_CONFIG)
+
+    def get_guardrail_audit(self, limit: int = 50) -> dict:
+        try:
+            return self._get("/guardrails/audit", params={"limit": limit})
+        except Exception:
+            return {"records": [], "total": 0}
+
     # ── Chat ──────────────────────────────────────────────────────────────────
 
     def create_session(self) -> dict:

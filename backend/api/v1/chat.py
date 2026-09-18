@@ -56,10 +56,34 @@ from backend.models.chat import (
     StreamErrorEvent,
     StreamTokenEvent,
 )
+from backend.api.v1.guardrails import get_current_config, record_audit
+from backend.guardrails.pipeline import (
+    AuditAccumulator,
+    run_context_guardrails,
+    run_post_generation_guardrails,
+    run_pre_retrieval_guardrails,
+)
+from backend.guardrails.retrieval_safety import resolve_top_n
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
+
+
+class GuardrailBlocked(Exception):
+    """
+    Raised internally when any guardrail layer blocks a request.
+
+    Carries the fixed, user-facing refusal message and the audit
+    accumulator so both the blocking (JSON) and streaming (SSE) endpoints
+    can surface the same behaviour: return the safe message, skip the
+    LLM call entirely, and still emit a complete audit record.
+    """
+
+    def __init__(self, message: str, audit: "AuditAccumulator"):
+        super().__init__(message)
+        self.message = message
+        self.audit = audit
 
 
 # ─── Lazy singletons (constructed once, reused across requests) ───────────────
@@ -184,6 +208,16 @@ def _save_turn(
     saver.put(cfg, state, {"updated_at": _now()})
 
 
+def _apply_output_safety_only(answer: str, guardrail_config):
+    """Layer 6 only — used for direct (greeting/casual) responses that skip Layer 5."""
+    from backend.guardrails.output_safety import apply_output_safety
+    return apply_output_safety(
+        answer,
+        enable_pii_masking=guardrail_config.toggles.enable_pii_masking_output,
+        enable_toxicity_check=guardrail_config.toggles.enable_output_toxicity_check,
+    )
+
+
 def _build_citations(citation_meta: List[Dict]) -> List[Citation]:
     """Convert PromptBuilder citation_meta dicts into Citation objects."""
     citations: List[Citation] = []
@@ -212,9 +246,11 @@ class _PipelineResult:
     __slots__ = (
         "messages", "citation_meta", "rag_context",
         "query_id", "retrieval_ms", "rerank_ms", "sanitized_query",
+        "context_chunks", "audit", "direct_response",
     )
     def __init__(self, messages, citation_meta, rag_context,
-                 query_id, retrieval_ms, rerank_ms, sanitized_query):
+                 query_id, retrieval_ms, rerank_ms, sanitized_query,
+                 context_chunks, audit, direct_response=False):
         self.messages        = messages
         self.citation_meta   = citation_meta
         self.rag_context     = rag_context
@@ -222,6 +258,12 @@ class _PipelineResult:
         self.retrieval_ms    = retrieval_ms
         self.rerank_ms       = rerank_ms
         self.sanitized_query = sanitized_query
+        self.context_chunks  = context_chunks
+        self.audit           = audit
+        # True for greeting/casual turns routed straight to the LLM with
+        # no retrieval — used so the caller skips Layer 5 groundedness/
+        # hallucination checks (there's no context to ground against).
+        self.direct_response = direct_response
 
 
 def _run_pipeline(
@@ -230,16 +272,24 @@ def _run_pipeline(
     query_id: str,
 ) -> _PipelineResult:
     """
-    Run stages 1-4 (retrieval → rerank → prompt build).
-    Fully synchronous — called from both the blocking and async-stream paths.
+    Run Layer 1-2 guardrails, stages 1-4 (retrieval → rerank → context
+    control → prompt build). Fully synchronous — called from both the
+    blocking and async-stream paths.
+
+    Raises ``GuardrailBlocked`` when any guardrail layer blocks the
+    request; the caller must catch this and return the carried message
+    without calling the LLM.
     """
+    guardrail_config = get_current_config()
+    audit = AuditAccumulator()
+
     # ── Stage 0 — Query & filter validation ────────────────────────────────────
     # Raw user input must never flow unvalidated into the OpenAI embedding
     # call, the local BM25 index, or Pinecone's filter= — see
     # backend.retrieval.query_validator for the sanitisation / allow-list
     # rules enforced here.
     try:
-        sanitized_query = sanitize_query(payload.query)
+        pre_sanitized_query = sanitize_query(payload.query)
     except QueryValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -248,10 +298,40 @@ def _run_pipeline(
     except FilterValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
+    # ── Layer 1 + 2 — Input guardrails, intent classification / routing ───────
+    pre_retrieval = run_pre_retrieval_guardrails(
+        pre_sanitized_query, guardrail_config, audit,
+    )
+    if pre_retrieval.blocked:
+        raise GuardrailBlocked(pre_retrieval.user_message, audit)
+
+    sanitized_query = pre_retrieval.sanitized_query
+
+    # Greeting / casual — direct LLM response, no retrieval at all.
+    if not pre_retrieval.route_to_rag:
+        history  = _load_history(saver, payload.session_id)
+        messages = history + [{"role": "user", "content": sanitized_query}]
+        rag_context = RagContext(
+            retrieved_count=0, after_filter_count=0, after_rerank_count=0,
+            context_chunks_used=0,
+        )
+        return _PipelineResult(
+            messages=messages, citation_meta=[], rag_context=rag_context,
+            query_id=query_id, retrieval_ms=0.0, rerank_ms=0.0,
+            sanitized_query=sanitized_query, context_chunks=[], audit=audit,
+            direct_response=True,
+        )
+
     # ── Stage 1 — Retrieval (dense | hybrid_bm25 | hybrid_splade) ─────────────
     # `hybrid_search=False` is kept as a backward-compatible override that
     # forces dense-only retrieval regardless of `retrieval_mode`.
     effective_mode = payload.retrieval_mode if payload.hybrid_search else "dense"
+
+    # Layer 3 — Retrieval Safety: Top-N before rerank is sourced from the
+    # guardrail config (default 20) rather than the ad-hoc `top_k * 5`
+    # heuristic, when hybrid retrieval / metadata filtering is enabled.
+    top_n = resolve_top_n(guardrail_config) if guardrail_config.toggles.enable_hybrid_retrieval else payload.top_k
+    over_fetch = max(top_n, payload.top_k)
 
     t_ret = time.perf_counter()
     retrieved = []
@@ -261,7 +341,7 @@ def _run_pipeline(
         retriever = _get_hybrid_retriever()
         retrieved = retriever.retrieve(
             query           = sanitized_query,
-            top_k           = max(payload.top_k * 5, 50),   # over-fetch before rerank
+            top_k           = over_fetch,
             namespace       = payload.namespace,
             metadata_filter = validated_filters,
             query_id        = query_id,
@@ -280,7 +360,9 @@ def _run_pipeline(
     after_filter_count  = retrieved_count   # no separate filter stage here
     after_rerank_count  = retrieved_count
 
-    # ── Stage 2 — Deduplication (lightweight, inline) ─────────────────────────
+    # ── Stage 2 — Deduplication (lightweight, inline id-based pass) ───────────
+    # Coarse id-based de-dup runs here; the finer-grained content/semantic
+    # de-dup (Layer 4.B) runs after reranking below.
     seen: set[str] = set()
     deduped = []
     for r in retrieved:
@@ -309,11 +391,24 @@ def _run_pipeline(
         after_rerank_count = len(reranked)
     rerank_ms = (time.perf_counter() - t_rerank) * 1_000
 
+    # ── Layer 4 — Context Control (relevance gate → dedup → relevance score) ──
+    context_result = run_context_guardrails(
+        query=sanitized_query,
+        retrieved_chunks=retrieved,
+        reranked_chunks=reranked,
+        config=guardrail_config,
+        audit=audit,
+    )
+    if context_result.blocked:
+        raise GuardrailBlocked(context_result.user_message, audit)
+
+    context_chunks = context_result.chunks
+
     # ── Stage 4 — Prompt build ────────────────────────────────────────────────
     history  = _load_history(saver, payload.session_id)
     messages, citation_meta = _get_prompt_builder().build(
         query   = sanitized_query,
-        chunks  = reranked,
+        chunks  = context_chunks,
         history = history,
     )
 
@@ -336,6 +431,8 @@ def _run_pipeline(
         retrieval_ms    = retrieval_ms,
         rerank_ms       = rerank_ms,
         sanitized_query = sanitized_query,
+        context_chunks  = context_chunks,
+        audit           = audit,
     )
 
 
@@ -399,8 +496,21 @@ async def query_rag(
     query_id = str(uuid.uuid4())
     t_total  = time.perf_counter()
 
-    # ── Stages 1-4 ────────────────────────────────────────────────────────────
-    pipe = _run_pipeline(payload, saver, query_id)
+    # ── Layer 1-4 (input guardrails, routing, retrieval, rerank, context) ─────
+    try:
+        pipe = _run_pipeline(payload, saver, query_id)
+    except GuardrailBlocked as exc:
+        record_audit(exc.audit.finalize())
+        return ChatResponse(
+            session_id  = payload.session_id,
+            query_id    = query_id,
+            query       = "",
+            answer      = exc.message,
+            citations   = [],
+            timestamp   = _now(),
+            model_used  = "guardrail",
+            rag_context = RagContext(),
+        )
 
     # ── Stage 5 — LLM generation (blocking) ──────────────────────────────────
     t_llm = time.perf_counter()
@@ -416,6 +526,49 @@ async def query_rag(
     except Exception as exc:
         logger.exception("LLM completion failed for query_id=%s", query_id)
         raise HTTPException(status_code=502, detail=f"LLM error: {exc}") from exc
+
+    # ── Layer 5-6 — Generation safety + output safety ─────────────────────────
+    guardrail_config = get_current_config()
+    if not pipe.direct_response:
+        post_gen = run_post_generation_guardrails(
+            answer          = answer,
+            context_chunks  = pipe.context_chunks,
+            citation_meta   = pipe.citation_meta,
+            config          = guardrail_config,
+            audit           = pipe.audit,
+        )
+        if post_gen.blocked:
+            record_audit(pipe.audit.finalize())
+            return ChatResponse(
+                session_id  = payload.session_id,
+                query_id    = query_id,
+                query       = pipe.sanitized_query,
+                answer      = post_gen.user_message,
+                citations   = [],
+                timestamp   = _now(),
+                model_used  = "guardrail",
+                rag_context = pipe.rag_context,
+            )
+        answer = post_gen.safe_answer
+    else:
+        # Direct (greeting/casual) responses still pass through output
+        # safety (Layer 6) even though generation safety (Layer 5) is
+        # skipped — there's no retrieved context to ground against.
+        output_result = _apply_output_safety_only(answer, guardrail_config)
+        if output_result.blocked:
+            record_audit(pipe.audit.finalize())
+            return ChatResponse(
+                session_id  = payload.session_id,
+                query_id    = query_id,
+                query       = pipe.sanitized_query,
+                answer      = output_result.user_message,
+                citations   = [],
+                timestamp   = _now(),
+                model_used  = "guardrail",
+                rag_context = pipe.rag_context,
+            )
+        answer = output_result.safe_text
+        pipe.audit.pii_types_detected_output.extend(output_result.pii_types_found)
 
     total_ms   = (time.perf_counter() - t_total) * 1_000
     citations  = _build_citations(pipe.citation_meta)
@@ -435,6 +588,8 @@ async def query_rag(
         ChatMessage(role="user",      content=pipe.sanitized_query, timestamp=timestamp, query_id=query_id),
         ChatMessage(role="assistant", content=answer,               timestamp=timestamp, query_id=query_id, citations=citations),
     )
+
+    record_audit(pipe.audit.finalize())
 
     logger.info(
         json.dumps({
@@ -519,6 +674,14 @@ async def stream_rag(
             pipe = await loop.run_in_executor(
                 None, _run_pipeline, payload, saver, query_id
             )
+        except GuardrailBlocked as exc:
+            record_audit(exc.audit.finalize())
+            done_evt = StreamDoneEvent(
+                query_id=query_id, answer=exc.message, citations=[],
+                rag_context=RagContext(),
+            )
+            yield f"data: {done_evt.model_dump_json()}\n\n"
+            return
         except HTTPException as exc:
             # Query/filter validation failures (Stage 0) — 400-equivalent.
             err = StreamErrorEvent(message="Invalid request", detail=str(exc.detail))
@@ -554,6 +717,40 @@ async def stream_rag(
         llm_ms    = (time.perf_counter() - t_llm)   * 1_000
         total_ms  = (time.perf_counter() - t_total) * 1_000
         answer    = "".join(answer_parts)
+
+        # ── Layer 5-6 — Generation safety + output safety ─────────────────────
+        # Tokens already streamed to the client are best-effort; the `done`
+        # event (and the persisted turn) reflect the guardrail-checked
+        # final answer, which is authoritative.
+        guardrail_config = get_current_config()
+        if not pipe.direct_response:
+            post_gen = run_post_generation_guardrails(
+                answer=answer, context_chunks=pipe.context_chunks,
+                citation_meta=pipe.citation_meta, config=guardrail_config,
+                audit=pipe.audit,
+            )
+            if post_gen.blocked:
+                record_audit(pipe.audit.finalize())
+                done_evt = StreamDoneEvent(
+                    query_id=query_id, answer=post_gen.user_message,
+                    citations=[], rag_context=pipe.rag_context,
+                )
+                yield f"data: {done_evt.model_dump_json()}\n\n"
+                return
+            answer = post_gen.safe_answer
+        else:
+            output_result = _apply_output_safety_only(answer, guardrail_config)
+            if output_result.blocked:
+                record_audit(pipe.audit.finalize())
+                done_evt = StreamDoneEvent(
+                    query_id=query_id, answer=output_result.user_message,
+                    citations=[], rag_context=pipe.rag_context,
+                )
+                yield f"data: {done_evt.model_dump_json()}\n\n"
+                return
+            answer = output_result.safe_text
+            pipe.audit.pii_types_detected_output.extend(output_result.pii_types_found)
+
         citations = _build_citations(pipe.citation_meta)
 
         # ── Emit citations ────────────────────────────────────────────────────
@@ -572,6 +769,7 @@ async def stream_rag(
             rag_context = pipe.rag_context,
         )
         yield f"data: {done_evt.model_dump_json()}\n\n"
+        record_audit(pipe.audit.finalize())
 
         # ── Persist turn ──────────────────────────────────────────────────────
         timestamp = _now()

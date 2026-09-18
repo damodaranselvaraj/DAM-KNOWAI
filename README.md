@@ -307,7 +307,7 @@ Open [http://localhost:8501](http://localhost:8501) in your browser. The sidebar
 | Chatbot | `03_chatbot.py` | Multi-turn RAG chat with citations |
 | Evaluation | `04_evaluation.py` | Runs and displays retrieval evaluation metrics (Recall@K, MRR, NDCG@K) |
 | Retrieval Options | `05_retrieval.py` | Adjust retrieval settings shared with the Chatbot page |
-| Knowledge Base | `06_knowledge_base.py` | Browse and manage ingested documents |
+| Guardrails | `06_guardrails.py` | Configure the 6-layer guardrail pipeline (input/output safety, PII masking, groundedness, etc.) applied to every chat query |
 | Settings | `07_settings.py` | App-level API connection and chat defaults (separate from pipeline config) |
 
 ---
