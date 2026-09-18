@@ -1,4 +1,4 @@
-# ─── KNOWAI — Streamlit frontend image ────────────────────────────────────────
+# ─── DAM KNOWAI — Streamlit frontend image ────────────────────────────────────────
 # Build from the repository root:
 #   docker build -f docker/Dockerfile.frontend -t rag-frontend .
 FROM python:3.11-slim AS base

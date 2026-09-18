@@ -17,7 +17,7 @@ from frontend.components.nav_sidebar import render_sidebar
 from frontend.config import settings
 
 # ─── Page config ──────────────────────────────────────────────────────────────
-st.set_page_config(page_title="Settings · KNOWAI", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="Settings · DAM KNOWAI", page_icon="🧠", layout="wide")
 
 _CSS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "styles", "custom.css")
 if os.path.exists(_CSS):
@@ -107,7 +107,7 @@ with st.expander("Session Management", expanded=False):
 # ═══════════════════════════════════════════════════════════════════════════════
 with st.expander("About", expanded=False):
     st.markdown(
-        "<p><strong>KNOWAI</strong> — Enterprise RAG Intelligence Platform</p>"
+        "<p><strong>DAM KNOWAI</strong> — Enterprise RAG Intelligence Platform</p>"
         "<p style='color:#8A9BAC;font-size:0.85rem'>v1.0.0 · Powered by Pinecone, OpenAI, and Docling</p>",
         unsafe_allow_html=True,
     )

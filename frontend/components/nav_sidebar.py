@@ -1,7 +1,7 @@
 """
 Shared sidebar navigation component.
 
-Renders the KNOWAI brand block, the primary nav group (Home / Admin Panel /
+Renders the DAM KNOWAI brand block, the primary nav group (Home / Admin Panel /
 Chatbot), the secondary nav group (Retrieval options / Guardrails / Evaluation),
 and the settings + version footer — identically across every page.
 
@@ -23,7 +23,7 @@ def render_sidebar() -> None:
         st.markdown(
             f"<div class='sidebar-brand'>"
             f"{icon('brain', size=40, color='#FFFFFF')}"
-            f"<p class='brand-name'>KNOWAI</p>"
+            f"<p class='brand-name'>DAM KNOWAI</p>"
             f"<p class='brand-sub'>Intelligent Knowledge Platform</p>"
             f"</div>",
             unsafe_allow_html=True,

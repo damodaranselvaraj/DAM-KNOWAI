@@ -20,7 +20,7 @@ from frontend.utils.constants import (
 from frontend.components.nav_sidebar import render_sidebar
 
 # ─── Page config ──────────────────────────────────────────────────────────────
-st.set_page_config(page_title="Admin Panel · KNOWAI", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="Admin Panel · DAM KNOWAI", page_icon="🧠", layout="wide")
 
 _CSS = os.path.join(os.path.dirname(os.path.dirname(__file__)), "styles", "custom.css")
 if os.path.exists(_CSS):
